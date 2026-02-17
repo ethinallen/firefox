@@ -3497,30 +3497,121 @@
     }
 
     /**
-     * Create a tree-based split pane with two tabs side by side.
+     * Create or extend a tree-based split pane.
+     *
+     * If no split tree exists, creates one from tab1 and tab2.
+     * If a split tree exists, splits the pane containing tab1 and places
+     * tab2 in the new pane.
      *
      * @param {MozTabbrowserTab} tab1
      * @param {MozTabbrowserTab} tab2
      * @param {"horizontal"|"vertical"} orientation
      */
     splitPane(tab1, tab2, orientation) {
-      if (this._splitTree) {
-        return;
-      }
-
       this._insertBrowser(tab1);
       this._insertBrowser(tab2);
 
-      this._splitTree = new this.SplitViewTree(
-        document,
-        this.tabpanels,
-        window
-      );
-      this._splitTree.split(tab1, tab2, orientation);
+      if (!this._splitTree) {
+        this._splitTree = new this.SplitViewTree(
+          document,
+          this.tabpanels,
+          window
+        );
+        this._ensureSplitTreeFocusHandler();
+        this._splitTree.split(tab1, tab2, orientation);
+        tab1.linkedBrowser.docShellIsActive = true;
+        tab2.linkedBrowser.docShellIsActive = true;
+        this._addSplitTreeFocusListeners(this._splitTree.allLeaves());
+        return;
+      }
 
-      tab1.linkedBrowser.docShellIsActive = true;
+      let leaf = this._splitTree.findLeaf(tab1);
+      if (!leaf || this._splitTree.hasTab(tab2)) {
+        return;
+      }
+      if (!this._splitTree.canSplit(leaf, orientation)) {
+        return;
+      }
+
+      let newLeaf = this._splitTree.splitLeaf(leaf, orientation, tab2);
       tab2.linkedBrowser.docShellIsActive = true;
+      this._addSplitTreeFocusListeners([newLeaf]);
+    }
 
+    /**
+     * Close a single pane in the split tree.
+     *
+     * @param {MozTabbrowserTab} tab - the tab whose pane to close
+     */
+    closeSplitPane(tab) {
+      if (!this._splitTree) {
+        return;
+      }
+      let leaf = this._splitTree.findLeaf(tab);
+      if (!leaf) {
+        return;
+      }
+
+      this._removeSplitTreeFocusListeners([leaf]);
+
+      let surviving = this._splitTree.closeLeaf(leaf);
+
+      leaf.tab.linkedBrowser.docShellIsActive = this.shouldActivateDocShell(
+        leaf.tab.linkedBrowser
+      );
+
+      if (!surviving) {
+        this._cleanupSplitTree();
+        return;
+      }
+
+      if (this._focusedSplitPane === leaf) {
+        this._focusedSplitPane = surviving;
+        this.selectedTab = surviving.tab;
+      }
+    }
+
+    /**
+     * Swap the tabs displayed in two split panes.
+     *
+     * @param {MozTabbrowserTab} tab1
+     * @param {MozTabbrowserTab} tab2
+     */
+    swapPaneTabs(tab1, tab2) {
+      if (!this._splitTree) {
+        return;
+      }
+      let leaf1 = this._splitTree.findLeaf(tab1);
+      let leaf2 = this._splitTree.findLeaf(tab2);
+      if (!leaf1 || !leaf2) {
+        return;
+      }
+
+      this._removeSplitTreeFocusListeners([leaf1, leaf2]);
+      this._splitTree.swapTabs(leaf1, leaf2);
+      this._addSplitTreeFocusListeners([leaf1, leaf2]);
+
+      if (this._focusedSplitPane === leaf1) {
+        this.selectedTab = leaf1.tab;
+      } else if (this._focusedSplitPane === leaf2) {
+        this.selectedTab = leaf2.tab;
+      }
+    }
+
+    closeSplitView() {
+      if (!this._splitTree) {
+        return;
+      }
+
+      this._removeSplitTreeFocusListeners(this._splitTree.allLeaves());
+      this._splitTree.destroy();
+      this._cleanupSplitTree();
+    }
+
+    _ensureSplitTreeFocusHandler() {
+      if (this._splitTreeFocusHandler) {
+        return;
+      }
       let self = this;
       this._splitTreeFocusHandler = function (event) {
         let browser = event.target;
@@ -3533,31 +3624,33 @@
           self._focusedSplitPane = self._splitTree.findLeaf(tab);
         }
       };
+    }
 
-      for (let leaf of this._splitTree.allLeaves()) {
-        let browser = leaf.tab.linkedBrowser;
-        browser.addEventListener("focus", this._splitTreeFocusHandler, true);
+    _addSplitTreeFocusListeners(leaves) {
+      for (let leaf of leaves) {
+        leaf.tab.linkedBrowser.addEventListener(
+          "focus",
+          this._splitTreeFocusHandler,
+          true
+        );
       }
     }
 
-    closeSplitView() {
-      if (!this._splitTree) {
+    _removeSplitTreeFocusListeners(leaves) {
+      if (!this._splitTreeFocusHandler) {
         return;
       }
-
-      if (this._splitTreeFocusHandler) {
-        for (let leaf of this._splitTree.allLeaves()) {
-          let browser = leaf.tab.linkedBrowser;
-          browser.removeEventListener(
-            "focus",
-            this._splitTreeFocusHandler,
-            true
-          );
-        }
-        this._splitTreeFocusHandler = null;
+      for (let leaf of leaves) {
+        leaf.tab.linkedBrowser.removeEventListener(
+          "focus",
+          this._splitTreeFocusHandler,
+          true
+        );
       }
+    }
 
-      this._splitTree.destroy();
+    _cleanupSplitTree() {
+      this._splitTreeFocusHandler = null;
       this._splitTree = null;
       this._focusedSplitPane = null;
 

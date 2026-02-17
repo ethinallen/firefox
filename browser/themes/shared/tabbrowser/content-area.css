@@ -249,36 +249,20 @@
 
 #tabbrowser-tabpanels[splitview-tree] {
   .split-tree-panel.split-view-panel-active {
-    margin: var(--space-xsmall);
-    position: relative;
-    width: unset;
-  }
-
-  .split-tree-panel[column="0"] {
-    order: 0;
-    margin-inline-end: 0;
+    min-width: 0;
+    min-height: 0;
   }
 
   .split-view-tree-splitter {
-    order: 1;
-    flex: none;
+    z-index: 1;
   }
 
-  .split-tree-panel[column="1"] {
-    order: 2;
-    margin-inline-start: 0;
+  .split-view-tree-splitter[data-orientation="vertical"] {
+    cursor: col-resize;
   }
 
-  .split-tree-panel {
-    --panel-min-width: 140px;
-    min-width: var(--panel-min-width);
-    max-width: calc(100% - var(--panel-min-width));
-    flex: 1;
-    width: 49.4%;
-  }
-
-  .split-tree-panel[width] {
-    flex: none;
+  .split-view-tree-splitter[data-orientation="horizontal"] {
+    cursor: row-resize;
   }
 
   .browserContainer {
