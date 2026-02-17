@@ -189,6 +189,11 @@ XPCOMUtils.defineLazyScriptGetter(
 );
 XPCOMUtils.defineLazyScriptGetter(
   this,
+  "splitViewTabSwitcher",
+  "chrome://browser/content/tabbrowser/splitview-tabswitcher.js"
+);
+XPCOMUtils.defineLazyScriptGetter(
+  this,
   ["CustomizationHandler", "AutoHideMenubar"],
   "chrome://browser/content/browser-customization.js"
 );

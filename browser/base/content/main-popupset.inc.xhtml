@@ -551,6 +551,19 @@
     <hbox id="ctrlTab-showAll-container" pack="center"/>
   </panel>
 
+  <panel id="splitViewTabSwitcher-panel"
+         hidden="true"
+         noautofocus="true"
+         norestorefocus="true"
+         level="top"
+         orient="vertical"
+         consumeoutsideclicks="true">
+    <arrowscrollbox id="splitViewTabSwitcher-tablist"
+                    orient="vertical"
+                    flex="1"
+                    smoothscroll="true"/>
+  </panel>
+
   <!-- TODO Bug 2008627: create lazily? -->
   <panel id="tab-preview-panel"
          type="arrow"

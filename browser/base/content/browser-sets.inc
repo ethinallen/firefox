@@ -123,6 +123,9 @@
     <command id="splitViewCmd_separateTabs"/>
     <command id="splitViewCmd_reverseTabs"/>
     <command id="splitViewCmd_closeTabs"/>
+    <command id="splitViewCmd_toggleTabSwitcher"/>
+    <command id="splitViewCmd_cycleTabUp"/>
+    <command id="splitViewCmd_cycleTabDown"/>
   </commandset>
 
   <keyset id="mainKeyset">
@@ -414,4 +417,28 @@
          modifiers="accel,alt"
          internal="true"/>
 #endif
+    <key id="key_splitViewToggleTabSwitcher"
+         key="s"
+#ifdef XP_MACOSX
+         modifiers="accel,alt"
+#else
+         modifiers="control,alt"
+#endif
+         command="splitViewCmd_toggleTabSwitcher"/>
+    <key id="key_splitViewCycleTabUp"
+         keycode="VK_UP"
+#ifdef XP_MACOSX
+         modifiers="accel,alt"
+#else
+         modifiers="control,alt"
+#endif
+         command="splitViewCmd_cycleTabUp"/>
+    <key id="key_splitViewCycleTabDown"
+         keycode="VK_DOWN"
+#ifdef XP_MACOSX
+         modifiers="accel,alt"
+#else
+         modifiers="control,alt"
+#endif
+         command="splitViewCmd_cycleTabDown"/>
   </keyset>

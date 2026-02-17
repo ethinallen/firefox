@@ -8997,6 +8997,15 @@
           case "splitViewCmd_closeTabs":
             this.#activeSplitView.close();
             break;
+          case "splitViewCmd_toggleTabSwitcher":
+            splitViewTabSwitcher.toggle();
+            break;
+          case "splitViewCmd_cycleTabUp":
+            splitViewTabSwitcher.cycleTab(false);
+            break;
+          case "splitViewCmd_cycleTabDown":
+            splitViewTabSwitcher.cycleTab(true);
+            break;
         }
       });
     }

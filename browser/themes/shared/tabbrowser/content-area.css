@@ -277,6 +277,54 @@
   }
 }
 
+/* Split view tab switcher */
+
+#splitViewTabSwitcher-panel {
+  --panel-width: 240px;
+  width: var(--panel-width);
+  max-height: 400px;
+  padding: 0;
+}
+
+#splitViewTabSwitcher-tablist {
+  padding: var(--space-xsmall) 0;
+}
+
+.splitViewTabSwitcher-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-small);
+  padding: var(--space-xsmall) var(--space-small);
+  cursor: default;
+  overflow: hidden;
+
+  &[selected="true"] {
+    background-color: var(--button-background-color-hover);
+  }
+
+  &[current="true"] {
+    font-weight: bold;
+  }
+
+  &:hover {
+    background-color: var(--button-background-color-hover);
+  }
+}
+
+.splitViewTabSwitcher-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  -moz-context-properties: fill;
+  fill: currentColor;
+}
+
+.splitViewTabSwitcher-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
 /* Split view */
 
 split-view-footer {

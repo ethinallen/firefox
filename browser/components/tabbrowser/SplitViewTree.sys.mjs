@@ -186,6 +186,16 @@ export class SplitViewTree {
    * @param {LeafNode} leaf1
    * @param {LeafNode} leaf2
    */
+  replaceLeafTab(leaf, newTab) {
+    let oldTab = leaf.tab;
+    if (oldTab) {
+      this._clearPanelStyles(leaf);
+    }
+    leaf.tab = newTab;
+    leaf.tabCycleIndex = 0;
+    this._applyLayout();
+  }
+
   swapTabs(leaf1, leaf2) {
     let tempTab = leaf1.tab;
     leaf1.tab = leaf2.tab;
